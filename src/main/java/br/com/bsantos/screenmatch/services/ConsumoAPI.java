@@ -1,4 +1,4 @@
-package br.com.bsantos.screenmatch;
+package br.com.bsantos.screenmatch.services;
 
 import java.io.IOException;
 import java.net.URI;
