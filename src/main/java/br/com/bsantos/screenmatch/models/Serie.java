@@ -1,5 +1,7 @@
 package br.com.bsantos.screenmatch.models;
 
+import br.com.bsantos.screenmatch.services.ConsultaGemini;
+
 import java.util.OptionalDouble;
 
 public class Serie {
@@ -19,7 +21,7 @@ public class Serie {
         this.genero = Categoria.fromString(dadosSerie.genero().split(",")[0].trim());
         this.atores = dadosSerie.atores();
         this.poster = dadosSerie.poster();
-        this.sinopse = dadosSerie.sinopse();
+        this.sinopse = ConsultaGemini.traduzSinopse(dadosSerie.sinopse());
     }
 
     public String getTitulo() {
