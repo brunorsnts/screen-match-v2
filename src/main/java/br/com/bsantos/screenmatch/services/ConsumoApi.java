@@ -6,9 +6,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class ConsumoAPI {
+public class ConsumoApi {
 
-    public static String obterDados(String address) {
+    public String obterDados(String address) {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = null;
         try {

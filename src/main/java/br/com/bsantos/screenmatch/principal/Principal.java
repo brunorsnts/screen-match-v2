@@ -1,85 +1,103 @@
 package br.com.bsantos.screenmatch.principal;
 
-import br.com.bsantos.screenmatch.entities.Episodio;
-import br.com.bsantos.screenmatch.models.DadosEpisodio;
 import br.com.bsantos.screenmatch.models.DadosSerie;
 import br.com.bsantos.screenmatch.models.DadosTemporada;
-import br.com.bsantos.screenmatch.services.ConsumoAPI;
-import br.com.bsantos.screenmatch.services.ConverterParaObjeto;
+import br.com.bsantos.screenmatch.models.Serie;
+import br.com.bsantos.screenmatch.services.ConsumoApi;
+import br.com.bsantos.screenmatch.services.ConverteDados;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
-    private static final Scanner SC = new Scanner(System.in);
-    private static final ConverterParaObjeto CONVERSOR = new ConverterParaObjeto();
-    private static final String ENDERECO_API = "http://www.omdbapi.com/?t=";
-    private static final String API_KEY = "&apiKey=e30b85e3";
-    private static int numTemporada;
+    private Scanner leitura = new Scanner(System.in);
+    private ConsumoApi consumo = new ConsumoApi();
+    private ConverteDados conversor = new ConverteDados();
+    private final String ENDERECO = "https://www.omdbapi.com/?t=";
+    private final String API_KEY = "&apiKey=" + System.getenv("OMDB_API_KEY");
 
-    public static void exibeMenu() {
-        System.out.print("Pesquise por uma série: ");
-        String serie = URLEncoder.encode(SC.nextLine());
-        String json = ConsumoAPI.obterDados(ENDERECO_API + serie + API_KEY);
-        DadosSerie dadosSerie = CONVERSOR.obterDados(json, DadosSerie.class);
-        System.out.println();
+    private List<DadosSerie> dadosSeries = new ArrayList<>();
 
-        // Dados da série
-        System.out.println(" ".repeat(8) + dadosSerie.titulo());
-        System.out.println("=".repeat(30));
-        System.out.println("Temporadas: " + dadosSerie.totalTemporadas());
-        System.out.println("Avaliação: " + dadosSerie.avaliacao());
-        System.out.println("=".repeat(30));
-        System.out.println();
+    public void exibeMenu() {
 
-        System.out.print("Temporada: ");
-        int temporada = SC.nextInt();
-        json = ConsumoAPI.obterDados(ENDERECO_API + serie + "&season=" + temporada + API_KEY);
-        DadosTemporada dadosTemporada = CONVERSOR.obterDados(json, DadosTemporada.class);
-        System.out.println();
+        var opcao = -1;
+        while (opcao != 0) {
+            var menu = """
+                    1 - Buscar séries
+                    2 - Buscar episódios
+                    3- Listar Séries
+                    
+                    0 - Sair                                 
+                    """;
 
-        // Dados da temporada
-        System.out.println(" ".repeat(8) + "Temporada " + temporada);
-        System.out.println("=".repeat(30));
-        dadosTemporada.episodios().forEach(x -> System.out.println("Episódio " + x.numeroEpisodio()));
-        System.out.println("=".repeat(30));
-        System.out.println();
+            System.out.println(menu);
+            opcao = validarInput("Selecione uma opção: ");
+            leitura.nextLine();
 
-        System.out.print("Episódio: ");
-        int episodio = SC.nextInt();
-        json = ConsumoAPI.obterDados(ENDERECO_API + serie + "&season=" + temporada + "&episode=" + episodio + API_KEY);
-        DadosEpisodio dadosEpisodio = CONVERSOR.obterDados(json, DadosEpisodio.class);
-        System.out.println();
+            switch (opcao) {
+                case 1:
+                    buscarSerieWeb();
+                    break;
+                case 2:
+                    buscarEpisodioPorSerie();
+                    break;
+                case 3:
+                    listarSeries();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println();
+            }
+        }
+    }
 
-        // Dados do episódio
-        System.out.println(" ".repeat(8) + "Episódio " + episodio);
-        System.out.println("=".repeat(60));
-        System.out.println("Temporada: " + dadosEpisodio.temporada());
-        System.out.println("Título: " + dadosEpisodio.titulo());
-        System.out.println("Sinopse: " + dadosEpisodio.descricao());
-        System.out.println("Duração: " + dadosEpisodio.duracao());
-        System.out.println("=".repeat(60));
-        System.out.println();
+    private void buscarSerieWeb() {
+        DadosSerie dados = getDadosSerie();
+        dadosSeries.add(dados);
+        System.out.println(dados);
+    }
 
-        System.out.println(" ".repeat(8) + "Top 5 melhores episódios");
-        System.out.println("=".repeat(60));
-        List<DadosEpisodio> dadosEpisodios = new ArrayList<>();
-        dadosTemporada.episodios().forEach(ep -> {
-            String newJson = ConsumoAPI.obterDados(ENDERECO_API + serie + "&season=" + temporada + "&episode=" + ep.numeroEpisodio() + API_KEY);
-            DadosEpisodio newDadosEpisodio = CONVERSOR.obterDados(newJson, DadosEpisodio.class);
-            dadosEpisodios.add(newDadosEpisodio);
-        });
+    private DadosSerie getDadosSerie() {
+        System.out.print("Digite o nome da série para busca: ");
+        var nomeSerie = leitura.nextLine();
+        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
+        DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
+        return dados;
+    }
 
-        dadosEpisodios.stream()
-                .map(Episodio::new)
-                .sorted(Comparator.comparing(Episodio::getAvaliacao).reversed())
-                .limit(5)
-                .forEach(ep -> System.out.println(ep + "\n" + "-".repeat(60)));
+    private void buscarEpisodioPorSerie(){
+        DadosSerie dadosSerie = getDadosSerie();
+        List<DadosTemporada> temporadas = new ArrayList<>();
 
-        System.out.println("=".repeat(60));
+        for (int i = 1; i <= dadosSerie.totalTemporadas(); i++) {
+            var json = consumo.obterDados(ENDERECO + dadosSerie.titulo().replace(" ", "+") + "&season=" + i + API_KEY);
+            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+            temporadas.add(dadosTemporada);
+        }
+        temporadas.forEach(System.out::println);
+    }
+
+    private int validarInput(String mensagem) {
+        try {
+            System.out.print(mensagem);
+            return leitura.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Por favor, insira um número.");
+            leitura.next();
+            return -1;
+        }
+    }
+
+    private void listarSeries() {
+        List<Serie> series = dadosSeries.stream()
+                        .map(Serie::new)
+                                .collect(Collectors.toList());
+        series.forEach(System.out::println);
     }
 }
