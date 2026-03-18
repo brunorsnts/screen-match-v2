@@ -68,7 +68,6 @@ public class Principal {
         DadosSerie dados = getDadosSerie();
         Serie serie = new Serie(dados);
         repository.save(serie);
-//        dadosSeries.add(dados);
         System.out.println(dados);
     }
 
@@ -104,9 +103,7 @@ public class Principal {
     }
 
     private void listarSeries() {
-        List<Serie> series = dadosSeries.stream()
-                        .map(Serie::new)
-                                .collect(Collectors.toList());
+        List<Serie> series = repository.findAll();
         series.forEach(System.out::println);
     }
 }
