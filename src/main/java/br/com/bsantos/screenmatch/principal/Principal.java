@@ -3,6 +3,7 @@ package br.com.bsantos.screenmatch.principal;
 import br.com.bsantos.screenmatch.models.DadosSerie;
 import br.com.bsantos.screenmatch.models.DadosTemporada;
 import br.com.bsantos.screenmatch.models.Serie;
+import br.com.bsantos.screenmatch.repositories.SerieRepository;
 import br.com.bsantos.screenmatch.services.ConsumoApi;
 import br.com.bsantos.screenmatch.services.ConverteDados;
 
@@ -21,6 +22,12 @@ public class Principal {
     private final String API_KEY = "&apiKey=" + System.getenv("OMDB_API_KEY");
 
     private List<DadosSerie> dadosSeries = new ArrayList<>();
+
+    private SerieRepository repository;
+
+    public Principal(SerieRepository repository) {
+        this.repository = repository;
+    }
 
     public void exibeMenu() {
 
@@ -59,7 +66,9 @@ public class Principal {
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
-        dadosSeries.add(dados);
+        Serie serie = new Serie(dados);
+        repository.save(serie);
+//        dadosSeries.add(dados);
         System.out.println(dados);
     }
 

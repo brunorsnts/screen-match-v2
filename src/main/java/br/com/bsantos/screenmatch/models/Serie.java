@@ -3,6 +3,8 @@ package br.com.bsantos.screenmatch.models;
 import br.com.bsantos.screenmatch.services.ConsultaGemini;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalDouble;
 
 @Entity
@@ -19,6 +21,8 @@ public class Serie {
     private String atores;
     private String poster;
     private String sinopse;
+    @Transient
+    private List<Episodio> episodios = new ArrayList<>();
 
     public Serie(DadosSerie dadosSerie) {
         this.titulo = dadosSerie.titulo();
@@ -94,6 +98,10 @@ public class Serie {
 
     public void setSinopse(String sinopse) {
         this.sinopse = sinopse;
+    }
+
+    public List<Episodio> getEpisodios() {
+        return episodios;
     }
 
     @Override
