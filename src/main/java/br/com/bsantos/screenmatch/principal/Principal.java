@@ -101,6 +101,8 @@ public class Principal {
                     .flatMap(t -> t.episodios().stream()
                             .map(e -> new Episodio(t.numero(), e)))
                     .collect(Collectors.toList());
+            serieEncontrada.setEpisodios(episodios);
+            repository.save(serieEncontrada);
             episodios.forEach(System.out::println);
         }
     }
