@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.Locale;
+
 @SpringBootApplication
 public class ScreenmatchApplication implements CommandLineRunner {
 
@@ -21,6 +23,7 @@ public class ScreenmatchApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        Locale.setDefault(Locale.US);
         Principal principal = new Principal(serieRepository);
         principal.exibeMenu();
     }

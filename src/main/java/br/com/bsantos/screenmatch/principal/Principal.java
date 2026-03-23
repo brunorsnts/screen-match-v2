@@ -33,10 +33,11 @@ public class Principal {
         var opcao = -1;
         while (opcao != 0) {
             var menu = """
-                    1 - Buscar séries
-                    2 - Buscar episódios
+                    1 - Buscar Séries
+                    2 - Buscar Episódios
                     3 - Listar Séries
                     4 - Buscar Série por Título
+                    5 - Buscar Série por Ator
                     
                     0 - Sair                                 
                     """;
@@ -57,6 +58,9 @@ public class Principal {
                     break;
                 case 4:
                     buscarSeriePorTitulo();
+                    break;
+                case 5:
+                    buscarSeriePorAtor();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -82,7 +86,7 @@ public class Principal {
         return dados;
     }
 
-    private void buscarEpisodioPorSerie(){
+    private void buscarEpisodioPorSerie() {
         listarSeries();
         System.out.print("Digite o nome da série para buscar os episódios: ");
         String nomeSerie = leitura.nextLine();
@@ -132,5 +136,18 @@ public class Principal {
         Serie serieEcontrada = repository.findByTituloContainingIgnoreCase(nomeSerie).orElseThrow(() -> new RuntimeException("Nenhuma série encontrada"));
 
         System.out.println("Série encontrada: " + serieEcontrada);
+    }
+
+    private void buscarSeriePorAtor() {
+        System.out.print("Digite o nome do ator ou atriz: ");
+        String nomeAtor = leitura.nextLine();
+        List<Serie> seriesEncontradas = repository.findByAtoresContainingIgnoreCase(nomeAtor);
+
+        if (seriesEncontradas.isEmpty()) {
+            System.out.println("Nenhuma série encontrada.");
+        } else {
+            System.out.println("Series encontradas: ");
+            seriesEncontradas.forEach(s -> System.out.println(s.getTitulo() + " | " + s.getAvaliacao()));
+        }
     }
 }
