@@ -1,9 +1,6 @@
 package br.com.bsantos.screenmatch.principal;
 
-import br.com.bsantos.screenmatch.models.DadosSerie;
-import br.com.bsantos.screenmatch.models.DadosTemporada;
-import br.com.bsantos.screenmatch.models.Episodio;
-import br.com.bsantos.screenmatch.models.Serie;
+import br.com.bsantos.screenmatch.models.*;
 import br.com.bsantos.screenmatch.repositories.SerieRepository;
 import br.com.bsantos.screenmatch.services.ConsumoApi;
 import br.com.bsantos.screenmatch.services.ConverteDados;
@@ -40,6 +37,7 @@ public class Principal {
                     4 - Buscar Série por Título
                     5 - Buscar Série por Ator
                     6 - Top 5 Séries
+                    7 - Buscar Série por Gênero
                     
                     0 - Sair                                 
                     """;
@@ -66,6 +64,9 @@ public class Principal {
                     break;
                 case 6:
                     top5Series();
+                    break;
+                case 7:
+                    buscarPorGenero();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -163,5 +164,14 @@ public class Principal {
             System.out.println(i + "° " + s.getTitulo() + " | " + s.getAvaliacao());
             i.getAndIncrement();
         });
+    }
+
+    private void buscarPorGenero() {
+        System.out.print("Qual Gênero deseja buscar: ");
+        String genero = leitura.nextLine();
+        Categoria categoria = Categoria.fromPortugues(genero);
+        List<Serie> seriesPorCategoria = repository.findByGenero(categoria);
+        System.out.println(genero + " :");
+        seriesPorCategoria.forEach(System.out::println7);
     }
 }
