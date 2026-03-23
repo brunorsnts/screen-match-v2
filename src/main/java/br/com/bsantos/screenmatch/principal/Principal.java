@@ -9,6 +9,7 @@ import br.com.bsantos.screenmatch.services.ConsumoApi;
 import br.com.bsantos.screenmatch.services.ConverteDados;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Principal {
@@ -38,6 +39,7 @@ public class Principal {
                     3 - Listar Séries
                     4 - Buscar Série por Título
                     5 - Buscar Série por Ator
+                    6 - Top 5 Séries
                     
                     0 - Sair                                 
                     """;
@@ -61,6 +63,9 @@ public class Principal {
                     break;
                 case 5:
                     buscarSeriePorAtor();
+                    break;
+                case 6:
+                    top5Series();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -149,5 +154,14 @@ public class Principal {
             System.out.println("Series encontradas: ");
             seriesEncontradas.forEach(s -> System.out.println(s.getTitulo() + " | " + s.getAvaliacao()));
         }
+    }
+
+    private void top5Series() {
+        AtomicInteger i = new AtomicInteger(1);
+        List<Serie> top5Series = repository.findByOrderByAvaliacaoDesc();
+        top5Series.forEach(s -> {
+            System.out.println(i + "° " + s.getTitulo() + " | " + s.getAvaliacao());
+            i.getAndIncrement();
+        });
     }
 }
