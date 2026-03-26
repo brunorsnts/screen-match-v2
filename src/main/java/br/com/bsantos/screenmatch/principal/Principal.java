@@ -17,7 +17,7 @@ public class Principal {
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apiKey=" + System.getenv("OMDB_API_KEY");
 
-    private List<DadosSerie> dadosSeries = new ArrayList<>();
+    private Serie serieBuscada;
     private List<Serie> series = new ArrayList<>();
 
     private SerieRepository repository;
@@ -40,6 +40,7 @@ public class Principal {
                     7 - Buscar Série por Gênero
                     8 - Busca Filtrada
                     9 - Buscar Episódios Por Trecho
+                    10 - Top 5 Episódios por Série
                     
                     0 - Sair                                 
                     """;
@@ -75,6 +76,10 @@ public class Principal {
                     break;
                 case 9:
                     buscarEpisodioPorTrecho();
+                    break;
+                case 10:
+                    top5EpisodiosPorSerie();
+                    break;
                 case 0:
                     System.out.println("Saindo...");
                     break;
@@ -146,9 +151,9 @@ public class Principal {
         System.out.print("Digite o nome da série: ");
         String nomeSerie = leitura.nextLine();
 
-        Serie serieEcontrada = repository.findByTituloContainingIgnoreCase(nomeSerie).orElseThrow(() -> new RuntimeException("Nenhuma série encontrada"));
+        serieBuscada = repository.findByTituloContainingIgnoreCase(nomeSerie).orElseThrow(() -> new RuntimeException("Nenhuma série encontrada"));
 
-        System.out.println("Série encontrada: " + serieEcontrada);
+        System.out.println("Série encontrada: " + serieBuscada);
     }
 
     private void buscarSeriePorAtor() {
@@ -200,5 +205,16 @@ public class Principal {
             System.out.printf("Série: %s | Temporada: %d | Episódio: %d | Título: %s\n",
                     e.getSerie().getTitulo(), e.getTemporada(), e.getNumeroEpisodio(), e.getTitulo());
         });
+    }
+
+    private void top5EpisodiosPorSerie() {
+        buscarSeriePorTitulo();
+        List<Episodio> topEpisodios = repository.topEpisodiosSerie(serieBuscada);
+        if (topEpisodios.isEmpty()) {
+            System.out.println("A série não possui avaliações nos episódios");
+        }
+        topEpisodios.forEach(e ->
+                System.out.printf("Temporada %d - Episódio %d - %s (%.1f)\n", e.getTemporada(), e.getNumeroEpisodio(), e.getTitulo(), e.getAvaliacao())
+        );
     }
 }
