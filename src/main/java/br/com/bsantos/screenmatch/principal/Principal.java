@@ -41,6 +41,7 @@ public class Principal {
                     8 - Busca Filtrada
                     9 - Buscar Episódios Por Trecho
                     10 - Top 5 Episódios por Série
+                    11 - Filtrar Episódio de uma Série A Partir de uma Data
                     
                     0 - Sair                                 
                     """;
@@ -79,6 +80,9 @@ public class Principal {
                     break;
                 case 10:
                     top5EpisodiosPorSerie();
+                    break;
+                case 11:
+                    filtraEpisodiosDaSerieApartirDeUmaData();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -216,5 +220,17 @@ public class Principal {
         topEpisodios.forEach(e ->
                 System.out.printf("Temporada %d - Episódio %d - %s (%.1f)\n", e.getTemporada(), e.getNumeroEpisodio(), e.getTitulo(), e.getAvaliacao())
         );
+    }
+
+    private void filtraEpisodiosDaSerieApartirDeUmaData() {
+        buscarSeriePorTitulo();
+        System.out.print("A partir de que ano deseja aplicar o filtro: ");
+        int ano = leitura.nextInt();
+        leitura.nextLine();
+        List<Episodio> episodiosFiltrados = repository.filtraEpisodiosDeUmaSerieApartirDeUmaData(serieBuscada, ano);
+        episodiosFiltrados.forEach(System.out::println);
+        if (episodiosFiltrados.isEmpty()) {
+            System.out.println("Nenhum episódio encontrado para o filtro aplicado.");
+        }
     }
 }
